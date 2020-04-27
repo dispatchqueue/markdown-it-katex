@@ -173,10 +173,10 @@ module.exports = function math_plugin(md, options) {
         return katexInline(tokens[idx].content);
     };
 
-    var katexBlock = function(latex){
+    var katexBlock = function(latex, attrs){
         options.displayMode = true;
         try{
-            return "<p>" + katex.renderToString(latex, options) + "</p>";
+            return `<p${attrs}>${katex.renderToString(latex, options)}</p>`
         }
         catch(error){
             if(options.throwOnError){ console.log(error); }
@@ -184,8 +184,9 @@ module.exports = function math_plugin(md, options) {
         }
     }
 
-    var blockRenderer = function(tokens, idx){
-        return  katexBlock(tokens[idx].content) + '\n';
+    var blockRenderer = function(tokens, idx, options, env, slf){
+        const token = tokens[idx]
+        return  katexBlock(token.content, slf.renderAttrs(token)) + '\n';
     }
 
     md.inline.ruler.after('escape', 'math_inline', math_inline);
